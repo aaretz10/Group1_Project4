@@ -1,12 +1,10 @@
-# Imports
+# import neccesary librarires
+
 import datetime
 import urllib.request
 import os
 import re
 from collections import Counter
-
-# Main Program
-
 
 # retrieve log file
 if not os.path.isfile('cache.log'):
@@ -73,11 +71,11 @@ for line in file:
 
         month_file.write(line)
         
-        # 4xx codes = unsuccessful requests
+        # 4xx codes are the ones for unsuccessful requests
         if re.search("\".*\" 4..", line) is not None:
             number_of_error += 1
         
-        # 3xx codes = redirected requests
+        # 3xx codes are the ones for redirected requests
         if re.search("\".*\" 3..", line) is not None:
             number_of_redirect += 1
         
@@ -90,7 +88,8 @@ for line in file:
 
 file.close()
 
-# output results
+#output results for the questions
+
 print("requests made in entire log period:", number_of_requests_total, "\n")
 
 for weekday_name in days:
@@ -115,5 +114,5 @@ print()
 
 most_requested_file = Counter(files).most_common(1)[0][0]
 least_requested_file = Counter(files).most_common()[-1][0]
-print("Most requested file:", most_requested_file)
-print("Least requested file:", least_requested_file)
+print("The most requested file is:", most_requested_file)
+print("The least requested file:", least_requested_file)
