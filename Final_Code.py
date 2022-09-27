@@ -1,64 +1,119 @@
-'''
-Group 1 Project 3
-This program will attain a specific HTTP log file from a server on the internet.
-The program will then check that the log file is where it needs to be.
-Using this log file, it will be parsed to show the total number of logs in the past 6 months, as well as all time logs.
-
-'''
-#necessary modules for program to run correctly
-from itertools import count
-import pip._vendor.requests 
-import os 
-from os.path import exists 
-from datetime import datetime
+# Imports
+import datetime
+import urllib.request
+import os
 import re
+from collections import Counter
 
-cwd = os.getcwd() # obtain file path 
-cwd += '\http_access_log.txt' # Make sure file path is appended to reflect where the HTTP log is stored
-
-file_exists = exists(cwd) # check if file exists
+# Main Program
 
 
-if file_exists == False: # conditional statement so the program will be able to determine if it needs to fetch the file or not. 
-
+# retrieve log file
+if not os.path.isfile('cache.log'):
     url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
-    r = pip._vendor.requests.get(url, allow_redirects = True) # create object to pass web file into
+    urllib.request.urlretrieve(url, 'cache.log')
 
-    f = open('http_access_log.txt', 'wb')
-    for chunk in r.iter_content(chunk_size = 8192):
-        if chunk:
-            f.write(chunk)
-    f.close() # Creates the file, writes the data from the object to it, then closes and saves itself.
+# read file
+file = open("cache.log", "r")
 
-# Get a count of how many total requests are in the entire log
-file = open('http_access_log.txt') 
-data = file.read()
-requests = data.count("GET")
-#prints the first output of the program, the total requests from the log
-print ('TOTAL REQUESTS IN LOG :', requests)
+# variables and dictionaries
+number_of_requests_total = 0
+number_of_error = 0
+number_of_redirect = 0
+days = {"Monday": 0, "Tuesday": 0, "Wednesday": 0, "Thursday": 0, "Friday": 0, "Saturday": 0, "Sunday": 0}
+weeks = {}
+months = {}
+files = {}
 
+previous_month_file = ""
+month_file = ""
 
-# Split file into a list of lines
-with open('http_access_log.txt', 'r') as sixmon:
-    lines = sixmon.readlines()
+# loop through and parse log file
+for line in file:
 
-with open('six_months_access_log.txt', 'w') as sixmon2:
-    for number, line in enumerate(lines):
-        if number not in range(0, 166364):
-            sixmon2.write(line)
-# Write last six months to the file only using the known range generated from parsing earlier
+    # valid requests only
+    if "[" in line:
+        number_of_requests_total += 1
+        
+        # parse date substring
+        start = line.find("[") + len("[")
+        end = line.find("]")
+        substring = line[start:end]
 
-file = open('six_months_access_log.txt') 
-data = file.read()
-lastsixrequests = data.count("GET")
-#prints the final output of the program, the number of requests from the last six months, according to the log (11 OCT 1995)
-print ('TOTAL NUMBER OF REQUESTS OVER LAST SIX MONTHS FROM 11 OCT 1995 :', lastsixrequests)
+        # translate to datetime
+        format_str = '%d/%b/%Y:%H:%M:%S %z'
+        datetime_obj = datetime.datetime.strptime(substring, format_str)
+        
+        # add count in dictionary for keys
+        # week day
+        weekday_name = datetime_obj.strftime("%A")
+        days[weekday_name] += 1
+        # week year
+        week_year = "week " + str(datetime_obj.isocalendar()[1]) + " of " + str(datetime_obj.year)
+        if week_year in weeks:
+            weeks[week_year] += 1
+        else:
+            weeks[week_year] = 1
+        # month year
+        month_year = datetime_obj.strftime("%B") + " " + str(datetime_obj.year)
+        if month_year in months:
+            months[month_year] += 1
+        else:
+            months[month_year] = 1
+        
+        # breakout into monthly log files
+        current_month_file = datetime_obj.strftime("%B") + str(datetime_obj.year) + ".log"
+        if previous_month_file != current_month_file:
+            previous_month_file = current_month_file
+            if not os.path.isfile(current_month_file):
+                month_file = open(current_month_file, "a")
+            else:
+                open(current_month_file, "w").close()
+                month_file = open(current_month_file, "a")
 
-#import collections
-import collections
-logfile =  open("http_access_log.txt", "r")
-clean_log=[]
-clean_log.append(line[line.index("GET")+4:line.index("HTTP")])
-#print the most requested file
-counter = collections.Counter(clean_log)
-print(str(count[1]) + "\t" + str(count[0]))
+        month_file.write(line)
+        
+        # 4xx codes = unsuccessful requests
+        if re.search("\".*\" 4..", line) is not None:
+            number_of_error += 1
+        
+        # 3xx codes = redirected requests
+        if re.search("\".*\" 3..", line) is not None:
+            number_of_redirect += 1
+        
+        # file names
+        filename = line.split(" ")[6]
+        if filename in files:
+            files[filename] += 1
+        else:
+            files[filename] = 1
+
+file.close()
+
+# output results
+print("requests made in entire log period:", number_of_requests_total, "\n")
+
+for weekday_name in days:
+    print(weekday_name, ":", days[weekday_name])
+    
+print()
+
+for week_year in weeks:
+    print(week_year, ":", weeks[week_year])
+
+print()
+
+for month_year in months:
+    print(month_year, ":", months[month_year])
+    
+print()
+
+print("Percentage of Requests as Errors: ", round((number_of_error * 100) / number_of_requests_total, 2), "%")
+print("Percentage of Requests as Redirects: ", round((number_of_redirect * 100) / number_of_requests_total, 2), "%")
+
+print()
+
+most_requested_file = Counter(files).most_common(1)[0][0]
+least_requested_file = Counter(files).most_common()[-1][0]
+print("Most requested file:", most_requested_file)
+print("Least requested file:", least_requested_file)
