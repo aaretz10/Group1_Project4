@@ -5,7 +5,7 @@ Final_Code.py is the file being submitted.
 Attached in the repo is a screenshot of the output as well.
 
 
----------------------------------------------------------------------------------------------------------------
+ --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
 Instructions:
 
 For this project, you will be working as a team, but will be graded individually. So each team member will be responsible to collaborate in a single GitHub repo, 
@@ -33,6 +33,34 @@ STEPS
         How many total requests were made in the time period represented by the log?
 
     You will need to output this data to the screen. The format you choose to do this is up to you, but your decisions and your implementation should be logical and consistent.
+    
+    --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+Group #1
+Project #4
+
+Final_Code.py is the file being submitted.
+Attached in the repo is a screenshot of the output as well.
+
+------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+Instructions:
+
+Marketing was very happy with the data you provided them. Now they want more. They have asked that you answer more questions  so they have a better idea about the nature of the
+visitors that are coming to the company website.
+
+Marketing is asking for answer to the following questions:
+
+How many requests were made on each day? 
+How many requests were made on a week-by-week basis? Per month?
+What percentage of the requests were not successful (any 4xx status code)?
+What percentage of the requests were redirected elsewhere (any 3xx codes)?
+What was the most-requested file?
+What was the least-requested file?
+
+Finally, it was decided that the logs should be broken into separate files by month, so that staff in the marketing department can do further analysis.
+Your program should split the log file into 12 smaller files, where the data stored in each file are the log events for a single month. 
+These should be written to disk in the same directory as your program file, in a logical and consistent manner.
+
 
 Your program should be created and developed using GitHub (I will be examining the commit logs to see your work). When the project is due, 
 submit your repository URL so I can clone the repo and test your program. Also, upload a screenshot of your program's output so I can see what it looks like when it is run on your machine.
