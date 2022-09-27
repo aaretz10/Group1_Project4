@@ -59,6 +59,6 @@ import collections
 logfile =  open("http_access_log.txt", "r")
 clean_log=[]
 clean_log.append(line[line.index("GET")+4:line.index("HTTP")])
-#print most requested file
+#print the most requested file
 counter = collections.Counter(clean_log)
 print(str(count[1]) + "\t" + str(count[0]))
