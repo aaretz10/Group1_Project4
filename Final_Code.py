@@ -5,9 +5,9 @@ The program will then check that the log file is where it needs to be.
 Using this log file, it will be parsed to show the total number of logs in the past 6 months, as well as all time logs.
 
 '''
-
-#import necessary modules for program to run correctly
-import requests 
+#necessary modules for program to run correctly
+from itertools import count
+import pip._vendor.requests 
 import os 
 from os.path import exists 
 from datetime import datetime
@@ -22,7 +22,7 @@ file_exists = exists(cwd) # check if file exists
 if file_exists == False: # conditional statement so the program will be able to determine if it needs to fetch the file or not. 
 
     url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
-    r = requests.get(url, allow_redirects = True) # create object to pass web file into
+    r = pip._vendor.requests.get(url, allow_redirects = True) # create object to pass web file into
 
     f = open('http_access_log.txt', 'wb')
     for chunk in r.iter_content(chunk_size = 8192):
@@ -53,3 +53,12 @@ data = file.read()
 lastsixrequests = data.count("GET")
 #prints the final output of the program, the number of requests from the last six months, according to the log (11 OCT 1995)
 print ('TOTAL NUMBER OF REQUESTS OVER LAST SIX MONTHS FROM 11 OCT 1995 :', lastsixrequests)
+
+#import collections
+import collections
+logfile =  open("http_access_log.txt", "r")
+clean_log=[]
+clean_log.append(line[line.index("GET")+4:line.index("HTTP")])
+#print the most requested file
+counter = collections.Counter(clean_log)
+print(str(count[1]) + "\t" + str(count[0]))
