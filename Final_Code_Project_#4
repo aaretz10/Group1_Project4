@@ -92,16 +92,19 @@ file.close()
 #output results for the questions
 print("requests made in entire log period:", number_of_requests_total, "\n")
 
+# for weekday name in days
 for weekday_name in days:
     print(weekday_name, ":", days[weekday_name])
     
 print()
 
+#for week year in weeks
 for week_year in weeks:
     print(week_year, ":", weeks[week_year])
 
 print()
 
+# for month year in months
 for month_year in months:
     print(month_year, ":", months[month_year])
     
