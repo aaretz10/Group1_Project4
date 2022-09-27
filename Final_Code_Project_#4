@@ -1,22 +1,19 @@
-# Imports
+# import neccesary librarires
 import datetime
 import urllib.request
 import os
 import re
 from collections import Counter
 
-# Main Program
-
-
 # retrieve log file
 if not os.path.isfile('cache.log'):
     url = 'https://s3.amazonaws.com/tcmg476/http_access_log'
     urllib.request.urlretrieve(url, 'cache.log')
 
-# read file
+# read log file
 file = open("cache.log", "r")
 
-# variables and dictionaries
+# the variables and dictionaries need for program
 number_of_requests_total = 0
 number_of_error = 0
 number_of_redirect = 0
@@ -28,10 +25,10 @@ files = {}
 previous_month_file = ""
 month_file = ""
 
-# loop through and parse log file
+# loop through & parse through log file
 for line in file:
 
-    # valid requests only
+    # to make sure its for valid requests only
     if "[" in line:
         number_of_requests_total += 1
         
@@ -40,28 +37,29 @@ for line in file:
         end = line.find("]")
         substring = line[start:end]
 
-        # translate to datetime
+        # format time stamp 
         format_str = '%d/%b/%Y:%H:%M:%S %z'
         datetime_obj = datetime.datetime.strptime(substring, format_str)
         
         # add count in dictionary for keys
-        # week day
+       
+        #for week day
         weekday_name = datetime_obj.strftime("%A")
         days[weekday_name] += 1
-        # week year
+        # for week year
         week_year = "week " + str(datetime_obj.isocalendar()[1]) + " of " + str(datetime_obj.year)
         if week_year in weeks:
             weeks[week_year] += 1
         else:
             weeks[week_year] = 1
-        # month year
+        # for month year
         month_year = datetime_obj.strftime("%B") + " " + str(datetime_obj.year)
         if month_year in months:
             months[month_year] += 1
         else:
             months[month_year] = 1
         
-        # breakout into monthly log files
+        # breaks it into monthly log files
         current_month_file = datetime_obj.strftime("%B") + str(datetime_obj.year) + ".log"
         if previous_month_file != current_month_file:
             previous_month_file = current_month_file
@@ -73,15 +71,15 @@ for line in file:
 
         month_file.write(line)
         
-        # 4xx codes = unsuccessful requests
+        # 4xx codes are the ones for unsuccessful requests
         if re.search("\".*\" 4..", line) is not None:
             number_of_error += 1
         
-        # 3xx codes = redirected requests
+        # 3xx codes are the ones for redirected requests
         if re.search("\".*\" 3..", line) is not None:
             number_of_redirect += 1
         
-        # file names
+        # the file names
         filename = line.split(" ")[6]
         if filename in files:
             files[filename] += 1
@@ -90,7 +88,8 @@ for line in file:
 
 file.close()
 
-# output results
+
+# #output results for the questions
 print("requests made in entire log period:", number_of_requests_total, "\n")
 
 for weekday_name in days:
@@ -115,5 +114,5 @@ print()
 
 most_requested_file = Counter(files).most_common(1)[0][0]
 least_requested_file = Counter(files).most_common()[-1][0]
-print("Most requested file:", most_requested_file)
-print("Least requested file:", least_requested_file)
+print("The most requested file is:", most_requested_file)
+print("The least requested file is:", least_requested_file)
