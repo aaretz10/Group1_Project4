@@ -13,7 +13,7 @@ if not os.path.isfile('cache.log'):
 # read log file
 file = open("cache.log", "r")
 
-# the variables and dictionaries need for program
+# the variables and dictionaries needed for program
 number_of_requests_total = 0
 number_of_error = 0
 number_of_redirect = 0
@@ -89,7 +89,7 @@ for line in file:
 file.close()
 
 
-# #output results for the questions
+#output results for the questions
 print("requests made in entire log period:", number_of_requests_total, "\n")
 
 for weekday_name in days:
